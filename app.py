@@ -227,6 +227,15 @@ def switch_user(uid):
     session["user_id"] = uid
     return redirect(request.referrer or "/")
 
+@app.route('/api/users/<int:user_id>', methods=['DELETE'])
+def delete_user(user_id):
+    user = User.query.get_or_404(user_id)
+    # 해당 팀원의 업무는 미배정으로 변경
+    Task.query.filter_by(user_id=user_id).update({'user_id': None})
+    db.session.delete(user)
+    db.session.commit()
+    return jsonify({'success': True, 'message': '팀원이 삭제되었습니다.'})
+    
 @app.route("/users/add", methods=["POST"])
 def add_user():
     n = request.form.get("name", "").strip()
