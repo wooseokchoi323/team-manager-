@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container" style="padding:30px">
+  <h2>⚙️ 팀원 설정</h2>
+
+  <!-- 팀원 목록 -->
+  <div class="card" style="margin-top:20px; padding:20px;">
+    <h3>👥 팀원 목록</h3>
+    <div id="userList" style="margin-top:15px;">
+      {% for user in users %}
+      <div class="user-item" id="user-{{ user.id }}"
+           style="display:flex; align-items:center; gap:15px;
+                  padding:12px; border:1px solid #e5e7eb;
+                  border-radius:8px; margin-bottom:10px;">
+        <div style="width:40px; height:40px; border-radius:50%;
+                    background:{{ user.color }}; color:white;
+                    display:flex; align-items:center; justify-content:center;
+                    font-weight:bold; font-size:16px;">
+          {{ user.name[0] }}
+        </div>
+        <div style="flex:1;">
+          <strong>{{ user.name }}</strong>
+          <span style="color:#6b7280; margin-left:8px;">{{ user.role }}</span>
+        </div>
+        <button onclick="deleteUser({{ user.id }}, '{{ user.name }}')"
+                style="background:#ef4444; color:white; border:none;
+                       padding:8px 16px; border-radius:6px; cursor:pointer;">
+          🗑️ 삭제
+        </button>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- 팀원 추가 -->
+  <div class="card" style="margin-top:20px; padding:20px;">
+    <h3>➕ 팀원 추가</h3>
+    <div style="display:flex; gap:10px; margin-top:15px; flex-wrap:wrap;">
+      <input id="newName" type="text" placeholder="이름"
+             style="padding:8px 12px; border:1px solid #d1d5db;
+                    border-radius:6px; flex:1; min-width:120px;">
+      <input id="newRole" type="text" placeholder="직책"
+             style="padding:8px 12px; border:1px solid #d1d5db;
+                    border-radius:6px; flex:1; min-width:120px;">
+      <input id="newColor" type="color" value="#6366f1"
+             style="padding:4px; border:1px solid #d1d5db;
+                    border-radius:6px; width:50px; cursor:pointer;">
+      <button onclick="addUser()"
+              style="background:#2563eb; color:white; border:none;
+                     padding:8px 20px; border-radius:6px; cursor:pointer;">
+        ➕ 추가
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+// 팀원 삭제
+function deleteUser(userId, userName) {
+  if (!confirm(userName + ' 팀원을 삭제하시겠습니까?\n해당 팀원의 업무는 미배정 상태로 변경됩니다.')) return;
+  fetch('/api/users/' + userId, {
+    method: 'DELETE',
+    headers: {'Content-Type': 'application/json'}
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      alert('✅ ' + userName + ' 팀원이 삭제되었습니다!');
+      document.getElementById('user-' + userId).remove();
+    } else {
+      alert('❌ 삭제 실패: ' + data.message);
+    }
+  });
+}
+
+// 팀원 추가
+function addUser() {
+  const name = document.getElementById('newName').value.trim();
+  const role = document.getElementById('newRole').value.trim();
+  const color = document.getElementById('newColor').value;
+  if (!name || !role) { alert('이름과 직책을 입력해주세요!'); return; }
+  fetch('/api/users', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({name, role, color})
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      alert('✅ ' + name + ' 팀원이 추가되었습니다!');
+      location.reload();
+    }
+  });
+}
+</script>
+{% endblock %}
