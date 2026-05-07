@@ -1,0 +1,123 @@
+
+:root {
+  --sb-w: 252px;
+  --sb-bg: #1e1b4b;
+  --sb-text: #a5b4fc;
+  --sb-hover: rgba(255,255,255,.08);
+  --sb-active: #4f46e5;
+  --primary: #4f46e5;
+  --body-bg: #f1f5f9;
+  --card-bg: #fff;
+  --border: #e2e8f0;
+  --text: #1e293b;
+  --muted: #64748b;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --info: #3b82f6;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Noto Sans KR",sans-serif;background:var(--body-bg);color:var(--text)}
+
+/* Layout */
+.layout{display:flex;min-height:100vh}
+
+/* Sidebar */
+.sidebar{width:var(--sb-w);background:var(--sb-bg);color:var(--sb-text);display:flex;flex-direction:column;position:fixed;inset:0 auto 0 0;z-index:1000;transition:transform .25s;overflow:hidden}
+.sb-brand{display:flex;align-items:center;gap:10px;padding:20px 18px;font-size:1.1rem;font-weight:800;color:#fff;border-bottom:1px solid rgba(255,255,255,.08)}
+.sb-brand i{color:#818cf8;font-size:1.25rem}
+.sb-nav{flex:1;padding:10px 0;list-style:none;overflow-y:auto}
+.sb-nav a{display:flex;align-items:center;gap:10px;padding:11px 18px;color:var(--sb-text);text-decoration:none;font-size:.92rem;font-weight:500;transition:all .15s}
+.sb-nav a i{width:18px;text-align:center;font-size:.88rem}
+.sb-nav a:hover{background:var(--sb-hover);color:#fff}
+.sb-nav a.active{background:var(--sb-active);color:#fff}
+.sb-footer{padding:12px;border-top:1px solid rgba(255,255,255,.08)}
+.user-btn{width:100%;display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.08);border:none;color:#fff;padding:10px 12px;border-radius:10px;cursor:pointer;font-family:inherit;font-size:.88rem;transition:background .15s}
+.user-btn:hover{background:rgba(255,255,255,.15)}
+.u-name{font-weight:600;font-size:.88rem;line-height:1.2}
+.u-role{font-size:.73rem;color:#a5b4fc}
+
+/* Avatar */
+.av{width:32px;height:32px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.82rem;flex-shrink:0}
+.av-sm{width:22px;height:22px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.7rem;vertical-align:middle;margin-right:3px}
+.av-lg{width:48px;height:48px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:1.2rem;flex-shrink:0}
+
+/* Main */
+.main{margin-left:var(--sb-w);flex:1;display:flex;flex-direction:column;min-height:100vh}
+.topbar{background:#fff;border-bottom:1px solid var(--border);padding:13px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.page-title{font-size:1.12rem;font-weight:700;color:var(--text);margin:0}
+.page-content{padding:20px 24px}
+
+/* Card */
+.card-box{background:var(--card-bg);border-radius:12px;border:1px solid var(--border);box-shadow:0 1px 3px rgba(0,0,0,.04);padding:20px}
+.card-box:hover{box-shadow:0 4px 12px rgba(0,0,0,.07)}
+
+/* Stat */
+.stat-num{font-size:2.2rem;font-weight:800;line-height:1}
+.stat-lbl{font-size:.78rem;color:var(--muted);margin-top:4px}
+
+/* Progress */
+.prog{height:6px;background:#e2e8f0;border-radius:3px;overflow:hidden}
+.prog-fill{height:100%;border-radius:3px;transition:width .3s}
+.prog-sm{height:4px}
+.prog-xs{height:3px}
+
+/* Badges */
+.bp{padding:2px 9px;border-radius:99px;font-size:.72rem;font-weight:600;border:1px solid;white-space:nowrap}
+.p-urgent{background:#fef2f2;color:#dc2626;border-color:#fecaca}
+.p-high{background:#fffbeb;color:#d97706;border-color:#fde68a}
+.p-medium{background:#eff6ff;color:#2563eb;border-color:#bfdbfe}
+.p-low{background:#f0fdf4;color:#16a34a;border-color:#bbf7d0}
+.s-todo{background:#f8fafc;color:#64748b;border-color:#e2e8f0}
+.s-in_progress{background:#fffbeb;color:#d97706;border-color:#fde68a}
+.s-done{background:#f0fdf4;color:#16a34a;border-color:#bbf7d0}
+
+/* Kanban */
+.kanban-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;align-items:start}
+.k-col{background:#f8fafc;border-radius:12px;padding:14px;min-height:220px;border:2px solid transparent;transition:border-color .2s,background .2s}
+.k-col.drag-over{border-color:var(--primary);background:#eff0ff}
+.k-hd{display:flex;align-items:center;gap:8px;margin-bottom:12px;font-weight:700;font-size:.9rem}
+.k-cnt{background:#fff;border-radius:20px;padding:1px 8px;font-size:.73rem;font-weight:600;color:var(--muted)}
+.task-card{background:#fff;border-radius:10px;padding:12px;margin-bottom:8px;border:1px solid #f1f5f9;box-shadow:0 1px 2px rgba(0,0,0,.04);cursor:grab;transition:box-shadow .15s;text-decoration:none;display:block;color:var(--text)}
+.task-card:hover{box-shadow:0 4px 10px rgba(0,0,0,.08);color:var(--text)}
+.task-card.dragging{opacity:.45;cursor:grabbing}
+.tc-title{font-weight:600;font-size:.87rem;margin-bottom:8px;line-height:1.4}
+.tc-foot{display:flex;align-items:center;justify-content:space-between;gap:6px;flex-wrap:wrap}
+.due{font-size:.73rem;color:var(--muted)}
+.due.over{color:var(--danger);font-weight:600}
+
+/* Calendar */
+.fc{font-family:"Noto Sans KR",sans-serif!important}
+.fc .fc-toolbar-title{font-size:.95rem!important;font-weight:700!important}
+.fc .fc-button-primary{background:var(--primary)!important;border-color:var(--primary)!important;font-size:.82rem!important}
+.fc .fc-button-primary:hover{background:#4338ca!important}
+.fc .fc-daygrid-event{border-radius:4px!important;font-size:.73rem!important;padding:1px 4px!important}
+
+/* Comments */
+.cmt-box{background:#f8fafc;border-radius:10px;padding:12px 14px;margin-bottom:8px}
+.cmt-meta{display:flex;align-items:center;gap:8px}
+.cmt-text{font-size:.87rem;margin-top:6px;line-height:1.5}
+
+/* Toast */
+.toast-n{position:fixed;bottom:24px;right:24px;background:#1e293b;color:#fff;padding:11px 18px;border-radius:10px;font-size:.87rem;font-weight:500;z-index:9999;opacity:0;transform:translateY(8px);transition:all .25s;box-shadow:0 4px 12px rgba(0,0,0,.2)}
+.toast-n.show{opacity:1;transform:translateY(0)}
+.toast-s{border-left:4px solid var(--success)}
+.toast-e{border-left:4px solid var(--danger)}
+
+/* Task Detail */
+.detail-section{border-top:1px solid var(--border);padding-top:16px;margin-top:16px}
+
+/* Responsive */
+@media(max-width:767px){
+  .sidebar{transform:translateX(-100%)}
+  .sidebar.open{transform:translateX(0)}
+  .main{margin-left:0}
+  .kanban-grid{grid-template-columns:1fr}
+  .page-content{padding:14px 16px}
+}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:#94a3b8}
+.fw6{font-weight:600}.fw7{font-weight:700}.fw8{font-weight:800}

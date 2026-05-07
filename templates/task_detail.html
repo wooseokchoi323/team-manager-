@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% block title %}{{ task.title }}{% endblock %}
+{% block page_title %}업무 상세{% endblock %}
+{% block topbar_right %}
+<a href="/tasks/{{ task.id }}/edit" class="btn btn-outline-primary btn-sm">
+  <i class="fas fa-edit me-1"></i>수정
+</a>
+<form method="POST" action="/tasks/{{ task.id }}/delete" style="display:inline"
+      onsubmit="return confirm('정말 삭제하시겠습니까?')">
+  <button type="submit" class="btn btn-outline-danger btn-sm">
+    <i class="fas fa-trash me-1"></i>삭제
+  </button>
+</form>
+{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+  <!-- Task Info -->
+  <div class="col-lg-8">
+    <div class="card-box mb-4">
+      <div class="d-flex align-items-start gap-3 mb-3 flex-wrap">
+        <h2 class="fw7 flex-grow-1" style="font-size:1.2rem">{{ task.title }}</h2>
+        <span class="bp s-{{ task.status }} bp-lg">{{ SMAP[task.status] }}</span>
+        <span class="bp p-{{ task.priority }} bp-lg">{{ PMAP[task.priority] }}</span>
+      </div>
+
+      {% if task.description %}
+      <p class="text-muted mb-3" style="line-height:1.7">{{ task.description }}</p>
+      {% endif %}
+
+      <!-- Progress -->
+      <div class="mb-3">
+        <div class="d-flex justify-content-between mb-1">
+          <span class="fw6" style="font-size:.88rem">진행률</span>
+          <span class="fw6" style="font-size:.88rem">{{ task.progress }}%</span>
+        </div>
+        <div class="prog">
+          <div class="prog-fill" style="width:{{ task.progress }}%;background:#4f46e5"></div>
+        </div>
+      </div>
+
+      <!-- Status Update Buttons -->
+      <div class="d-flex gap-2 flex-wrap">
+        <small class="text-muted me-1 align-self-center">상태 변경:</small>
+        {% if task.status != 'todo' %}
+        <button onclick="quickStatus({{ task.id }}, 'todo')" class="btn btn-sm btn-outline-secondary">할 일</button>
+        {% endif %}
+        {% if task.status != 'in_progress' %}
+        <button onclick="quickStatus({{ task.id }}, 'in_progress')" class="btn btn-sm btn-outline-warning">진행 중</button>
+        {% endif %}
+        {% if task.status != 'done' %}
+        <button onclick="quickStatus({{ task.id }}, 'done')" class="btn btn-sm btn-success">✅ 완료</button>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Comments -->
+    <div class="card-box">
+      <h5 class="fw7 mb-3">💬 댓글 ({{ cmts|length }})</h5>
+      {% for cmt in cmts %}
+      <div class="cmt-box">
+        <div class="cmt-meta">
+          <span class="av-sm" style="background:{{ cmt.author.color }}">{{ cmt.author.name[0] }}</span>
+          <span class="fw6" style="font-size:.85rem">{{ cmt.author.name }}</span>
+          <small class="text-muted">{{ cmt.created_at.strftime('%Y.%m.%d %H:%M') }}</small>
+        </div>
+        <div class="cmt-text">{{ cmt.content }}</div>
+      </div>
+      {% endfor %}
+      {% if not cmts %}
+      <p class="text-muted text-center py-2" style="font-size:.88rem">아직 댓글이 없습니다.</p>
+      {% endif %}
+
+      <form method="POST" action="/tasks/{{ task.id }}/comment" class="mt-3">
+        <div class="d-flex gap-2">
+          <span class="av-sm mt-1" style="background:{{ u.color }}">{{ u.name[0] }}</span>
+          <div class="flex-grow-1">
+            <textarea name="content" class="form-control" rows="2"
+                      placeholder="댓글을 입력하세요..." required></textarea>
+            <button type="submit" class="btn btn-primary btn-sm mt-2">댓글 등록</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Sidebar Info -->
+  <div class="col-lg-4">
+    <div class="card-box">
+      <h6 class="fw7 text-muted mb-3">📌 업무 정보</h6>
+      <div class="d-flex flex-column gap-3">
+        <div>
+          <small class="text-muted d-block mb-1">담당자</small>
+          {% if task.assignee %}
+          <span class="av-sm" style="background:{{ task.assignee.color }}">{{ task.assignee.name[0] }}</span>
+          <span class="fw6">{{ task.assignee.name }}</span>
+          <small class="text-muted">({{ task.assignee.role }})</small>
+          {% else %}<span class="text-muted">미지정</span>{% endif %}
+        </div>
+        <div>
+          <small class="text-muted d-block mb-1">등록자</small>
+          {% if task.creator %}
+          <span class="av-sm" style="background:{{ task.creator.color }}">{{ task.creator.name[0] }}</span>
+          <span class="fw6">{{ task.creator.name }}</span>
+          {% else %}<span class="text-muted">-</span>{% endif %}
+        </div>
+        {% if task.due_date %}
+        <div>
+          <small class="text-muted d-block mb-1">마감일</small>
+          <span class="fw6 {{ 'text-danger' if task.is_overdue else '' }}">
+            <i class="fas fa-calendar me-1"></i>{{ task.due_date.strftime('%Y년 %m월 %d일') }}
+            {% if task.is_overdue %}<span class="badge bg-danger ms-1">초과</span>{% endif %}
+          </span>
+        </div>
+        {% endif %}
+        <div>
+          <small class="text-muted d-block mb-1">등록일</small>
+          <span>{{ task.created_at.strftime('%Y.%m.%d') }}</span>
+        </div>
+        <div>
+          <small class="text-muted d-block mb-1">최종 수정</small>
+          <span>{{ task.updated_at.strftime('%Y.%m.%d') }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% block title %}칸반 보드{% endblock %}
+{% block page_title %}📋 칸반 보드{% endblock %}
+{% block topbar_right %}
+<a href="/tasks/add?next=/kanban" class="btn btn-primary btn-sm"><i class="fas fa-plus me-1"></i>업무 추가</a>
+{% endblock %}
+
+{% block content %}
+<!-- Filters -->
+<div class="card-box mb-4 d-flex gap-3 align-items-center flex-wrap py-3">
+  <span class="fw6 text-muted"><i class="fas fa-filter me-1"></i>필터</span>
+  <form method="GET" action="/kanban" class="d-flex gap-2 flex-wrap align-items-center mb-0">
+    <select name="user" class="form-select form-select-sm" style="width:auto" onchange="this.form.submit()">
+      <option value="all" {{ 'selected' if fu=='all' else '' }}>전체 팀원</option>
+      {% for usr in users %}
+      <option value="{{ usr.id }}" {{ 'selected' if fu==usr.id|string else '' }}>{{ usr.name }}</option>
+      {% endfor %}
+    </select>
+    <select name="priority" class="form-select form-select-sm" style="width:auto" onchange="this.form.submit()">
+      <option value="all" {{ 'selected' if fp=='all' else '' }}>전체 우선순위</option>
+      <option value="urgent" {{ 'selected' if fp=='urgent' else '' }}>🔴 긴급</option>
+      <option value="high" {{ 'selected' if fp=='high' else '' }}>🟠 높음</option>
+      <option value="medium" {{ 'selected' if fp=='medium' else '' }}>🔵 보통</option>
+      <option value="low" {{ 'selected' if fp=='low' else '' }}>🟢 낮음</option>
+    </select>
+    {% if fu != 'all' or fp != 'all' %}
+    <a href="/kanban" class="btn btn-sm btn-outline-secondary">초기화</a>
+    {% endif %}
+  </form>
+</div>
+
+<!-- Kanban Board -->
+<div class="kanban-grid">
+  <!-- TODO -->
+  <div class="k-col" data-status="todo">
+    <div class="k-hd">
+      <span style="width:10px;height:10px;border-radius:50%;background:#94a3b8;display:inline-block"></span>
+      할 일
+      <span class="k-cnt">{{ todo|length }}</span>
+    </div>
+    <div class="k-cards">
+      {% for t in todo %}
+      <a href="/tasks/{{ t.id }}" class="task-card" data-id="{{ t.id }}" data-status="todo">
+        <div class="tc-title">{{ t.title }}</div>
+        <div class="prog prog-sm mb-2">
+          <div class="prog-fill" style="width:{{ t.progress }}%;background:#94a3b8"></div>
+        </div>
+        <div class="tc-foot">
+          <span class="av-sm" style="background:{{ t.assignee.color if t.assignee else '#ccc' }}">
+            {{ t.assignee.name[0] if t.assignee else '?' }}
+          </span>
+          <span class="bp p-{{ t.priority }}">{{ PMAP[t.priority] }}</span>
+          {% if t.due_date %}
+          <span class="due {{ 'over' if t.is_overdue else '' }}">
+            <i class="fas fa-clock me-1"></i>{{ t.due_date.strftime('%m.%d') }}
+          </span>
+          {% endif %}
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- IN PROGRESS -->
+  <div class="k-col" data-status="in_progress">
+    <div class="k-hd">
+      <span style="width:10px;height:10px;border-radius:50%;background:#f59e0b;display:inline-block"></span>
+      진행 중
+      <span class="k-cnt">{{ inp|length }}</span>
+    </div>
+    <div class="k-cards">
+      {% for t in inp %}
+      <a href="/tasks/{{ t.id }}" class="task-card" data-id="{{ t.id }}" data-status="in_progress">
+        <div class="tc-title">{{ t.title }}</div>
+        <div class="prog prog-sm mb-2">
+          <div class="prog-fill" style="width:{{ t.progress }}%;background:#f59e0b"></div>
+        </div>
+        <div class="tc-foot">
+          <span class="av-sm" style="background:{{ t.assignee.color if t.assignee else '#ccc' }}">
+            {{ t.assignee.name[0] if t.assignee else '?' }}
+          </span>
+          <span class="bp p-{{ t.priority }}">{{ PMAP[t.priority] }}</span>
+          {% if t.due_date %}
+          <span class="due {{ 'over' if t.is_overdue else '' }}">
+            <i class="fas fa-clock me-1"></i>{{ t.due_date.strftime('%m.%d') }}
+          </span>
+          {% endif %}
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- DONE -->
+  <div class="k-col" data-status="done">
+    <div class="k-hd">
+      <span style="width:10px;height:10px;border-radius:50%;background:#10b981;display:inline-block"></span>
+      완료
+      <span class="k-cnt">{{ done|length }}</span>
+    </div>
+    <div class="k-cards">
+      {% for t in done %}
+      <a href="/tasks/{{ t.id }}" class="task-card" data-id="{{ t.id }}" data-status="done" style="opacity:.75">
+        <div class="tc-title text-decoration-line-through text-muted">{{ t.title }}</div>
+        <div class="prog prog-sm mb-2">
+          <div class="prog-fill" style="width:100%;background:#10b981"></div>
+        </div>
+        <div class="tc-foot">
+          <span class="av-sm" style="background:{{ t.assignee.color if t.assignee else '#ccc' }}">
+            {{ t.assignee.name[0] if t.assignee else '?' }}
+          </span>
+          <span class="bp s-done">완료</span>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

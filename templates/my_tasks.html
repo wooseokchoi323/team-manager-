@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block title %}내 업무{% endblock %}
+{% block page_title %}✅ 내 업무{% endblock %}
+{% block topbar_right %}
+<a href="/tasks/add?next=/my-tasks" class="btn btn-primary btn-sm"><i class="fas fa-plus me-1"></i>업무 추가</a>
+{% endblock %}
+
+{% block content %}
+<!-- Stat Cards -->
+<div class="row g-3 mb-4">
+  <div class="col-4">
+    <div class="card-box text-center">
+      <div class="stat-num text-secondary">{{ tc }}</div>
+      <div class="stat-lbl">할 일</div>
+    </div>
+  </div>
+  <div class="col-4">
+    <div class="card-box text-center">
+      <div class="stat-num text-warning">{{ ic }}</div>
+      <div class="stat-lbl">진행 중</div>
+    </div>
+  </div>
+  <div class="col-4">
+    <div class="card-box text-center">
+      <div class="stat-num text-success">{{ dc }}</div>
+      <div class="stat-lbl">완료</div>
+    </div>
+  </div>
+</div>
+
+<!-- Filter Tabs -->
+<div class="d-flex gap-2 mb-3">
+  <a href="/my-tasks" class="btn btn-sm {{ 'btn-primary' if fs=='all' else 'btn-outline-secondary' }}">전체</a>
+  <a href="/my-tasks?status=todo" class="btn btn-sm {{ 'btn-primary' if fs=='todo' else 'btn-outline-secondary' }}">할 일</a>
+  <a href="/my-tasks?status=in_progress" class="btn btn-sm {{ 'btn-primary' if fs=='in_progress' else 'btn-outline-secondary' }}">진행 중</a>
+  <a href="/my-tasks?status=done" class="btn btn-sm {{ 'btn-primary' if fs=='done' else 'btn-outline-secondary' }}">완료</a>
+</div>
+
+<!-- Task List -->
+{% if tasks %}
+<div class="d-flex flex-column gap-3">
+  {% for t in tasks %}
+  <div class="card-box">
+    <div class="d-flex align-items-start gap-3">
+      <div class="flex-grow-1">
+        <div class="d-flex align-items-center gap-2 flex-wrap mb-1">
+          <a href="/tasks/{{ t.id }}" class="fw7 text-decoration-none text-dark" style="font-size:.95rem">{{ t.title }}</a>
+          <span class="bp s-{{ t.status }}">{{ SMAP[t.status] }}</span>
+          <span class="bp p-{{ t.priority }}">{{ PMAP[t.priority] }}</span>
+          {% if t.is_overdue %}
+          <span class="bp" style="background:#fef2f2;color:#dc2626;border-color:#fecaca">⚠️ 마감초과</span>
+          {% endif %}
+        </div>
+        {% if t.description %}
+        <p class="text-muted mb-2" style="font-size:.85rem">{{ t.description[:80] }}{% if t.description|length > 80 %}...{% endif %}</p>
+        {% endif %}
+        <div class="d-flex align-items-center gap-3">
+          <div class="d-flex align-items-center gap-2 flex-grow-1" style="max-width:300px">
+            <div class="prog flex-grow-1">
+              <div class="prog-fill" style="width:{{ t.progress }}%;background:{{ u.color }}"></div>
+            </div>
+            <small class="fw6 text-muted">{{ t.progress }}%</small>
+          </div>
+          {% if t.due_date %}
+          <small class="text-muted"><i class="fas fa-calendar me-1"></i>{{ t.due_date.strftime('%Y.%m.%d') }}</small>
+          {% endif %}
+        </div>
+      </div>
+      <div class="d-flex gap-1">
+        {% if t.status != 'done' %}
+        <button onclick="quickStatus({{ t.id }}, 'done')" class="btn btn-success btn-sm">
+          <i class="fas fa-check"></i>
+        </button>
+        {% endif %}
+        <a href="/tasks/{{ t.id }}/edit" class="btn btn-outline-secondary btn-sm">
+          <i class="fas fa-edit"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="card-box text-center py-5 text-muted">
+  <i class="fas fa-clipboard-check fa-3x mb-3 opacity-25"></i>
+  <p class="fw6">{% if fs == 'all' %}담당 업무가 없습니다.{% else %}해당 상태의 업무가 없습니다.{% endif %}</p>
+  <a href="/tasks/add?next=/my-tasks" class="btn btn-primary btn-sm mt-2">업무 추가하기</a>
+</div>
+{% endif %}
+{% endblock %}

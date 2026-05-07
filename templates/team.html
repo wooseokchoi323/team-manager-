@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% block title %}팀 현황{% endblock %}
+{% block page_title %}👥 팀 현황{% endblock %}
+{% block topbar_right %}
+<button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addUserModal">
+  <i class="fas fa-user-plus me-1"></i>팀원 추가
+</button>
+{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+  {% for d in td %}
+  <div class="col-md-6">
+    <div class="card-box">
+      <!-- User Header -->
+      <div class="d-flex align-items-center gap-3 mb-3">
+        <span class="av-lg" style="background:{{ d.user.color }}">{{ d.user.name[0] }}</span>
+        <div>
+          <div class="fw7" style="font-size:1rem">{{ d.user.name }}</div>
+          <small class="text-muted">{{ d.user.role }} · {{ d.user.email or '-' }}</small>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="row g-2 mb-3">
+        <div class="col-4 text-center">
+          <div class="fw8" style="font-size:1.5rem">{{ d.all|length }}</div>
+          <small class="text-muted">전체</small>
+        </div>
+        <div class="col-4 text-center">
+          <div class="fw8 text-warning" style="font-size:1.5rem">{{ d.inp|length }}</div>
+          <small class="text-muted">진행중</small>
+        </div>
+        <div class="col-4 text-center">
+          <div class="fw8 text-success" style="font-size:1.5rem">{{ d.done|length }}</div>
+          <small class="text-muted">완료</small>
+        </div>
+      </div>
+
+      <!-- Progress -->
+      <div class="d-flex align-items-center gap-2 mb-3">
+        <div class="prog flex-grow-1">
+          <div class="prog-fill" style="width:{{ d.prog }}%;background:{{ d.user.color }}"></div>
+        </div>
+        <span class="fw6" style="font-size:.85rem">{{ d.prog }}%</span>
+      </div>
+
+      {% if d.overdue %}
+      <div class="alert alert-danger py-1 px-2 mb-2" style="font-size:.8rem">
+        <i class="fas fa-exclamation-triangle me-1"></i>마감초과 {{ d.overdue|length }}건
+      </div>
+      {% endif %}
+
+      <!-- Task List -->
+      {% if d.all %}
+      <div style="max-height:200px;overflow-y:auto">
+        {% for t in d.all %}
+        <a href="/tasks/{{ t.id }}" class="d-flex align-items-center gap-2 py-1 border-bottom text-decoration-none text-dark">
+          <div class="flex-grow-1" style="min-width:0">
+            <span class="text-truncate d-block" style="font-size:.83rem">{{ t.title }}</span>
+          </div>
+          <span class="bp s-{{ t.status }}" style="font-size:.68rem">{{ SMAP[t.status] }}</span>
+          {% if t.due_date %}
+          <small class="text-muted" style="font-size:.73rem;white-space:nowrap">{{ t.due_date.strftime('%m.%d') }}</small>
+          {% endif %}
+        </a>
+        {% endfor %}
+      </div>
+      {% else %}
+      <p class="text-muted text-center py-2 mb-0" style="font-size:.85rem">담당 업무 없음</p>
+      {% endif %}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<!-- Add User Modal -->
+<div class="modal fade" id="addUserModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title fw7">👤 팀원 추가</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form method="POST" action="/users/add">
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label fw6">이름 *</label>
+            <input type="text" name="name" class="form-control" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw6">이메일</label>
+            <input type="email" name="email" class="form-control">
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw6">역할</label>
+            <input type="text" name="role" class="form-control" value="팀원">
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw6">대표 색상</label>
+            <input type="color" name="color" class="form-control form-control-color" value="#3B82F6">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+          <button type="submit" class="btn btn-primary">추가</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

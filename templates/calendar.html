@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}캘린더{% endblock %}
+{% block page_title %}📅 캘린더{% endblock %}
+{% block topbar_right %}
+<a href="/tasks/add?next=/calendar" class="btn btn-primary btn-sm"><i class="fas fa-plus me-1"></i>업무 추가</a>
+{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/index.global.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="card-box mb-3 d-flex gap-3 align-items-center flex-wrap py-2">
+  <small class="text-muted fw6">색상 범례:</small>
+  <span><span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:#6B7280;margin-right:4px"></span>할 일</span>
+  <span><span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:#F59E0B;margin-right:4px"></span>진행 중</span>
+  <span><span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:#10B981;margin-right:4px"></span>완료</span>
+</div>
+<div class="card-box">
+  <div id="calendar"></div>
+</div>
+
+<!-- Event Modal -->
+<div class="modal fade" id="eventModal" tabindex="-1">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header py-2">
+        <h6 class="modal-title fw7" id="m-title"></h6>
+        <button type="button" class="btn-close btn-sm" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body py-3">
+        <p><strong>담당자:</strong> <span id="m-assignee"></span></p>
+        <p><strong>우선순위:</strong> <span id="m-priority"></span></p>
+        <p><strong>마감일:</strong> <span id="m-date"></span></p>
+        <div class="prog mt-2"><div class="prog-fill" id="m-prog-fill" style="background:#4f46e5"></div></div>
+        <small class="text-muted" id="m-prog-txt"></small>
+      </div>
+      <div class="modal-footer py-2">
+        <a href="#" class="btn btn-primary btn-sm" id="m-link">상세 보기</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/index.global.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/locales/ko.global.min.js"></script>
+<script>
+const events = {{ events|safe }};
+const pmap = {urgent:"긴급",high:"높음",medium:"보통",low:"낮음"};
+document.addEventListener("DOMContentLoaded", () => {
+  const cal = new FullCalendar.Calendar(document.getElementById("calendar"), {
+    locale: "ko",
+    initialView: "dayGridMonth",
+    headerToolbar: {left:"prev,next today",center:"title",right:"dayGridMonth,listWeek"},
+    events: events,
+    height: "auto",
+    eventClick: function(info) {
+      const p = info.event.extendedProps;
+      document.getElementById("m-title").textContent = info.event.title;
+      document.getElementById("m-assignee").textContent = p.assignee || "미지정";
+      document.getElementById("m-priority").textContent = pmap[p.priority] || p.priority;
+      document.getElementById("m-date").textContent = info.event.startStr;
+      document.getElementById("m-prog-fill").style.width = p.progress + "%";
+      document.getElementById("m-prog-txt").textContent = "진행률: " + p.progress + "%";
+      document.getElementById("m-link").href = "/tasks/" + p.tid;
+      new bootstrap.Modal(document.getElementById("eventModal")).show();
+    }
+  });
+  cal.render();
+});
+</script>
+{% endblock %}

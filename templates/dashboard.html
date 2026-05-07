@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% block title %}대시보드{% endblock %}
+{% block page_title %}📊 대시보드{% endblock %}
+{% block topbar_right %}
+<a href="/tasks/add?next=/" class="btn btn-primary btn-sm"><i class="fas fa-plus me-1"></i>업무 추가</a>
+{% endblock %}
+
+{% block content %}
+<!-- Stat Cards -->
+<div class="row g-3 mb-4">
+  <div class="col-6 col-md-3">
+    <div class="card-box text-center">
+      <div class="stat-num">{{ total }}</div>
+      <div class="stat-lbl">📋 전체 업무</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card-box text-center">
+      <div class="stat-num text-warning">{{ inp_c }}</div>
+      <div class="stat-lbl">⚡ 진행 중</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card-box text-center">
+      <div class="stat-num text-success">{{ done_c }}</div>
+      <div class="stat-lbl">✅ 완료</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card-box text-center">
+      <div class="stat-num" style="color:#4f46e5">{{ rate }}%</div>
+      <div class="stat-lbl">🎯 완료율</div>
+    </div>
+  </div>
+</div>
+
+{% if overdue %}
+<div class="alert alert-danger d-flex align-items-center gap-2 mb-4">
+  <i class="fas fa-exclamation-triangle"></i>
+  <strong>마감 초과 {{ overdue|length }}건:</strong>
+  {% for t in overdue %}
+  <a href="/tasks/{{ t.id }}" class="badge bg-danger text-decoration-none">{{ t.title[:15] }}...</a>
+  {% endfor %}
+</div>
+{% endif %}
+
+<div class="row g-4">
+  <!-- Team Stats -->
+  <div class="col-lg-8">
+    <div class="card-box">
+      <h5 class="fw7 mb-3">👥 팀원별 업무 현황</h5>
+      {% for s in stats %}
+      <div class="d-flex align-items-center gap-3 py-2 border-bottom">
+        <span class="av-sm" style="background:{{ s.user.color }}">{{ s.user.name[0] }}</span>
+        <div style="min-width:90px">
+          <span class="fw6" style="font-size:.88rem">{{ s.user.name }}</span>
+          <br><small class="text-muted">{{ s.user.role }}</small>
+        </div>
+        <div class="d-flex gap-1">
+          <span class="bp s-todo">할일 {{ s.user.a_tasks|selectattr("status","eq","todo")|list|length }}</span>
+          <span class="bp s-in_progress">진행 {{ s.inp }}</span>
+          <span class="bp s-done">완료 {{ s.done }}</span>
+        </div>
+        <div class="flex-grow-1 d-flex align-items-center gap-2">
+          <div class="prog flex-grow-1">
+            <div class="prog-fill" style="width:{{ s.prog }}%;background:{{ s.user.color }}"></div>
+          </div>
+          <small class="fw6" style="min-width:32px">{{ s.prog }}%</small>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Right Column -->
+  <div class="col-lg-4">
+    <!-- Upcoming Deadlines -->
+    <div class="card-box mb-3">
+      <h5 class="fw7 mb-3">⏰ 이번 주 마감</h5>
+      {% if upcoming %}
+        {% for t in upcoming %}
+        <a href="/tasks/{{ t.id }}" class="d-flex align-items-center gap-2 py-2 border-bottom text-decoration-none text-dark">
+          <span class="av-sm" style="background:{{ t.assignee.color if t.assignee else '#ccc' }}">
+            {{ t.assignee.name[0] if t.assignee else '?' }}
+          </span>
+          <div class="flex-grow-1" style="min-width:0">
+            <div class="fw6 text-truncate" style="font-size:.85rem">{{ t.title }}</div>
+            <small class="text-muted">{{ t.due_date.strftime('%m월 %d일') }}</small>
+          </div>
+          <span class="bp p-{{ t.priority }}">{{ PMAP[t.priority] }}</span>
+        </a>
+        {% endfor %}
+      {% else %}
+        <div class="text-center py-3 text-muted">
+          <i class="fas fa-check-circle fa-2x text-success mb-2"></i>
+          <div>이번 주 마감 업무 없음 🎉</div>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Recent Tasks -->
+    <div class="card-box">
+      <h5 class="fw7 mb-3">🕐 최근 등록 업무</h5>
+      {% for t in recent %}
+      <a href="/tasks/{{ t.id }}" class="d-flex align-items-center gap-2 py-2 border-bottom text-decoration-none text-dark">
+        <div class="flex-grow-1" style="min-width:0">
+          <div class="fw6 text-truncate" style="font-size:.85rem">{{ t.title }}</div>
+          <small class="text-muted">{{ t.created_at.strftime('%m.%d') }}</small>
+        </div>
+        <span class="bp s-{{ t.status }}">{{ SMAP[t.status] }}</span>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}
