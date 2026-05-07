@@ -236,6 +236,21 @@ def add_user():
         db.session.commit()
     return redirect(url_for("team"))
 
+with app.app_context():
+    db.create_all()
+    # 초기 팀원 데이터 생성
+    if User.query.count() == 0:
+        users = [
+            User(name='김팀장', role='팀장', color='#6366f1'),
+            User(name='이개발', role='개발자', color='#3b82f6'),
+            User(name='박디자인', role='디자이너', color='#ec4899'),
+            User(name='최기획', role='기획자', color='#f59e0b'),
+            User(name='정QA', role='QA', color='#10b981'),
+        ]
+        for u in users:
+            db.session.add(u)
+        db.session.commit()
+
 if __name__ == "__main__":
     with app.app_context(): init()
     app.run(debug=True, host="0.0.0.0", port=5000)
