@@ -260,6 +260,19 @@ with app.app_context():
             db.session.add(u)
         db.session.commit()
 
+@app.route('/settings')
+def settings():
+    users = User.query.all()
+    return render_template('settings.html', users=users)
+
+@app.route('/api/users/<int:user_id>', methods=['DELETE'])
+def delete_user(user_id):
+    user = User.query.get_or_404(user_id)
+    Task.query.filter_by(user_id=user_id).update({'user_id': None})
+    db.session.delete(user)
+    db.session.commit()
+    return jsonify({'success': True, 'message': '팀원이 삭제되었습니다.'})
+
 if __name__ == "__main__":
     with app.app_context(): init()
     app.run(debug=True, host="0.0.0.0", port=5000)
